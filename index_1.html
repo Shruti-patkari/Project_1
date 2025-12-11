@@ -1,0 +1,143 @@
+Imports System.Data.OleDb
+Public Class frmcustdetails
+    Dim ds As New DataSet
+    Dim custda As OleDbDataAdapter
+    Dim itemda As OleDbDataAdapter
+    Dim mycon As New OleDbConnection(s)
+    Dim custitem As DataRelation
+    Dim dr As DataRow
+    Dim i As Integer = 0
+
+
+    Private Sub frmcustdetails_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        mycon.Open()
+        custda = New OleDbDataAdapter("select * from customertable", s)
+        custda.Fill(ds, "customer")
+        
+        Dim dr As DataRow = ds.Tables("customer").Rows(i)
+        txtid.Text = dr(0)
+        txtname.Text = dr(1)
+        txtadress.Text = dr(2)
+        txtcontact.Text = dr(3)
+        navigate()
+
+
+    End Sub
+
+
+    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+        Me.Close()
+
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+
+    End Sub
+    Private Sub navigate()
+        itemda = New OleDbDataAdapter("select * from saleitemdetails where custautoid=" & txtid.Text & "", s)
+        itemda.Fill(ds, "saleitem")
+
+
+
+        DataGridView1.Rows.Clear()
+
+
+
+        Dim r As Integer
+        For Each dr As DataRow In ds.Tables("saleitem").Rows
+            DataGridView1.Rows.Add()
+            DataGridView1.Item(0, r).Value = dr.Item("saleitemid").ToString
+            DataGridView1.Item(1, r).Value = dr.Item("modelautoid").ToString
+            DataGridView1.Item(2, r).Value = dr.Item("descrp").ToString
+            DataGridView1.Item(3, r).Value = dr.Item("rate").ToString
+            DataGridView1.Item(4, r).Value = dr.Item("quantity").ToString
+            DataGridView1.Item(5, r).Value = dr.Item("amount").ToString
+            r += 1
+
+        Next
+
+
+        'custda = Nothing
+        itemda = Nothing
+        'ds.Tables.Remove("customer")
+        ds.Tables.Remove("saleitem")
+
+
+
+
+
+
+
+    End Sub
+    Private Sub showrelation()
+
+
+        dr = ds.Tables("customer").Rows(i)
+        txtid.Text = dr(0)
+        txtname.Text = dr(1)
+        txtadress.Text = dr(2)
+
+    End Sub
+
+    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+        i = i + 1
+        If i > ds.Tables("customer").Rows.Count - 1 Then
+            MsgBox("You are on Last Record")
+            i = ds.Tables("customer").Rows.Count - 1
+        End If
+        showrelation()
+        navigate()
+
+    End Sub
+
+    Private Sub Button5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button5.Click
+        i = i - 1
+        If i < 0 Then
+            MsgBox("You are on First Record")
+            i = 0
+        End If
+        showrelation()
+        navigate()
+
+    End Sub
+
+    Private Sub btnfirst_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnfirst.Click
+        i = 0
+        showrelation()
+        navigate()
+
+    End Sub
+
+    Private Sub btnlast_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnlast.Click
+        i = ds.Tables("customer").Rows.Count - 1
+        showrelation()
+        navigate()
+
+    End Sub
+
+    Private Sub btnclear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnclear.Click
+       
+
+
+        Dim custinsert As OleDbCommand
+        custinsert = New OleDbCommand
+        custinsert.Connection = mycon
+
+
+
+        custinsert.CommandText = "insert into customertable values(" & txtid.Text & ",'" & txtname.Text & "','" & txtadress.Text & "','" & txtcontact.Text & "')"
+        custinsert.ExecuteNonQuery()
+
+      
+        MsgBox("Record Save Succesfully")
+
+
+
+
+
+    End Sub
+
+    Private Sub txtadress_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtadress.TextChanged
+
+    End Sub
+End Class
